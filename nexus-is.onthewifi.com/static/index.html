@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+<!-- Mirrored from nexus-is.onthewifi.com/static/ by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 01 Jan 2026 22:49:32 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=utf-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>New Tab</title>
+    <link rel="stylesheet" href="../storage/css/evenmorestyles.css" />
+    <link
+      rel="stylesheet"
+      href="../../cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../storage/css/static.css" />
+  </head>
+  <body> 
+    <script src="../particles.js"></script>
+    <script src="../storage/js/app.js"></script>
+    <div id="particles-js"></div>
+    <script src="../storage/js/particles-toggle.js" defer></script>
+
+    <h1>NEXUS</h1>
+    <p id="dynamicParagraph">(TEXT)</p>
+    <div id="search-container">
+      <form id="uv-form">
+        <input
+          id="uv-search-engine"
+          value="https://duckduckgo.com/?q=%s&kp=1&ia=web"
+          type="hidden"
+        />
+        <input
+          id="uv-address"
+          type="text"
+          autocomplete="off"
+          class="search-bar-home"
+          placeholder="search (－ _ －) zzZ"
+        />
+        <button id="search-button" onclick="search()">
+          SEARCH <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+      </form>
+      <div class="desc left-margin">
+        <p id="uv-error"></p>
+        <pre id="uv-error-code"></pre>
+      </div>
+    </div>
+
+    <script src="uv/uv.bundle.js" defer></script>
+    <script src="uv/uv.config.js" defer></script>
+    <script src="register-sw.js" defer></script>
+    <script type="text/javascript" src="../storage/js/background.js"></script>
+    <script src="../storage/js/splash-messages.js"></script>
+    
+    <script>
+      document.getElementById("uv-form").addEventListener("submit", function (
+        event
+      ) {
+        event.preventDefault();
+        search();
+      });
+
+      function search() {
+        const inputRaw = document.getElementById("uv-address").value.trim();
+        if (!inputRaw) return;
+
+       const blockedTerms = new Set([
+         "adult", "adultfriendfinder", "adultfriendfinder.com", "amateurporn", "boobs",
+         "breast", "p0rn", "br3ast", "camgirl", "camsoda", "camsoda.com", "chaturbate",
+         "chaturbate.com", "cum", "erotic", "escortservice", "fuck", "gangbang",
+         "gambling", "privatecams", "hentai", "hentaimovie", "hardcore", "jizz",
+         "marijuana", "meth", "milf", "nudity", "onlyfans", "nfsw", "ome",
+         "ome.tv", "porn", "pussy", "redtube", "boob", "sex",
+         "sex.com", "sexshop", "eroticmedia", "slut", "stripchat", "tits", "tube8",
+         "tube8.com", "webcam", "weed", "williamhill.com", "xhamster", "goon",
+         "xnx", "xvideo", "xxx", "gay sex", "youjizz", "hotvideos",
+         "bet365.com", "bongacams", "bongacams.com", "block-access", "pokerstars.uk"
+       ]);
+
+       const lowerInput = inputRaw.toLowerCase();
+
+       for (const word of lowerInput.split(/[^a-z0-9.]+/)) {
+         if (blockedTerms.has(word)) {
+            window.location.href = "../pages/apps-framec971.html?url=/pages/blocked.html";
+            return;
+         }
+       }
+
+        const hasProtocol = /^https?:\/\//i.test(inputRaw);
+        const looksLikeURL = /\.[a-z]{2,}(\/|$)/i.test(inputRaw);
+        let finalURL;
+
+        if (hasProtocol) {
+          finalURL = inputRaw;
+        } else if (looksLikeURL) {
+          finalURL = "http://" + inputRaw;
+        } else {
+          const searchEngine = document.getElementById("uv-search-engine").value;
+          finalURL = searchEngine.replace("%s", encodeURIComponent(inputRaw));
+        }
+
+        window.location.href = `/static/embed?p=${finalURL}`;
+      }
+    </script>
+
+    <script>
+      async function regsw() {
+        await navigator.serviceWorker.register("uv-sw.js", {
+          scope: "/static/",
+        });
+      }
+      regsw();
+    </script>
+
+    <script>
+      const code = [
+        "ArrowUp",
+        "ArrowUp",
+        "ArrowDown",
+        "ArrowDown",
+        "ArrowLeft",
+        "ArrowRight",
+        "ArrowLeft",
+        "ArrowRight",
+        "b",
+        "a",
+        "Enter",
+      ];
+      let currentKeyIndex = 0;
+      document.addEventListener("keydown", (event) => {
+        if (event.key === code[currentKeyIndex]) {
+          currentKeyIndex++;
+          if (currentKeyIndex === code.length) {
+            window.location.href = "../pages/secret/index.html";
+            currentKeyIndex = 0;
+          }
+        } else {
+          currentKeyIndex = 0;
+        }
+      });
+    </script>
+  </body>
+
+<!-- Mirrored from nexus-is.onthewifi.com/static/ by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 01 Jan 2026 22:49:34 GMT -->
+</html>

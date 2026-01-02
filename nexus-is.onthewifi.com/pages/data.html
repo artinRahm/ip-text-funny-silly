@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Data Manager</title>
+
+  <link rel="icon" href="../storage/images/googleclassroom.png" type="image/png" />
+  <link rel="stylesheet" href="../storage/css/data.css" />
+  <link rel="stylesheet" href="../storage/css/style.css" />
+
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    rel="stylesheet"
+  />
+</head>
+
+<body>
+  <div id="particles-js"></div>
+
+  <div id="dataManager">
+    <h1>Data Manager</h1>
+
+    <!-- SETTINGS BUTTON -->
+    <button id="settingsBtn">
+      <i class="fas fa-cog"></i> Settings
+    </button>
+
+    <br /><br />
+
+    <label for="downloadButton">Export Data</label>
+    <button id="downloadButton" style="display: none;">Export Data</button>
+
+    <label for="uploadInput">Import Data</label>
+    <input type="file" id="uploadInput" accept=".save" />
+
+    <p id="uploadStatus" style="margin-top: 15px; color: white;"></p>
+  </div>
+
+  <!-- CONFIRM POPUP -->
+  <div id="popup" style="display:none;">
+    <div id="popupContent">
+      <p>
+        Warning: Uploading will overwrite your existing data.
+        Type <b>CONFIRM</b> to proceed.
+      </p>
+      <input type="text" id="confirmationText" />
+      <button id="confirmUpload">Confirm</button>
+      <button id="cancelUpload">Cancel</button>
+    </div>
+  </div>
+
+  <script>
+    /* SETTINGS REDIRECT */
+    document.getElementById("settingsBtn").onclick = () => {
+      window.location.href = "../pages/settings.html";
+    };
+
+    function reloadPage() {
+      location.reload();
+    }
+
+    document.getElementById("downloadButton").onclick = () => {
+      const siteData = {
+        cookies: getCookies(),
+        localStorage: getLocalStorage(),
+      };
+
+      const blob = new Blob([JSON.stringify(siteData, null, 2)], {
+        type: "application/json",
+      });
+
+      const link = document.createElement("a");
+      const date = new Date().toISOString().split("T")[0];
+      link.href = URL.createObjectURL(blob);
+      link.download = `nexus-data.${date}.save`;
+      link.click();
+    };
+
+    document.getElementById("uploadInput").onchange = (event) => {
+      const file = event.target.files[0];
+      if (!file || !file.name.endsWith(".save")) {
+        document.getElementById("uploadStatus").textContent =
+          "That was not a valid save file.";
+        return;
+      }
+
+      document.getElementById("popup").style.display = "flex";
+
+      document.getElementById("confirmUpload").onclick = () => {
+        if (document.getElementById("confirmationText").value !== "CONFIRM") {
+          reloadPage();
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const data = JSON.parse(reader.result);
+            setCookies(data.cookies);
+            setLocalStorage(data.localStorage);
+            document.getElementById("uploadStatus").textContent =
+              "Upload successful!";
+            document.getElementById("popup").style.display = "none";
+          } catch {
+            reloadPage();
+          }
+        };
+        reader.readAsText(file);
+      };
+
+      document.getElementById("cancelUpload").onclick = reloadPage;
+    };
+
+    function getCookies() {
+      return document.cookie.split("; ").reduce((a, c) => {
+        const [k, v] = c.split("=");
+        a[k] = decodeURIComponent(v);
+        return a;
+      }, {});
+    }
+
+    function setCookies(cookies) {
+      Object.entries(cookies).forEach(([k, v]) => {
+        document.cookie = `${k}=${encodeURIComponent(v)}; path=/`;
+      });
+    }
+
+    function getLocalStorage() {
+      return { ...localStorage };
+    }
+
+    function setLocalStorage(data) {
+      Object.entries(data).forEach(([k, v]) => {
+        localStorage.setItem(k, v);
+      });
+    }
+
+    /* BLOCK DIRECT ACCESS */
+    const params = new URLSearchParams(window.location.search);
+    if (!params.get("upd")) {
+      window.location.href = "../index.html";
+    }
+  </script>
+</body>
+</html>

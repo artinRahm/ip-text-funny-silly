@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Mirrored from nexus-is.onthewifi.com/pages/prox/settings by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 01 Jan 2026 22:49:34 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=utf-8" /><!-- /Added by HTTrack -->
+<head>
+  <meta property="og:title" content="Nexus | Settings">
+  <meta property="og:description" content="Edit your website settings here!">
+  <meta property="og:image" content="../../storage/images/logo.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings</title>
+  <link rel="icon" href="../storage/images/googleclassroom.html" type="image/png">
+  <link href="../../../cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <link href="../../storage/css/settings.css" rel="stylesheet">
+  <link href="../../storage/css/style.css" rel="stylesheet">
+</head>
+<body>
+  <script src="../../particles.js"></script>
+  <script src="../../storage/js/app.js"></script>
+  <div id="particles-js"></div>
+
+  <div class="settings-container">
+    <h1>Settings</h1>
+
+    <label for="backgroundColorPicker">Select Background Color:</label>
+    <input type="color" id="backgroundColorPicker">
+
+    <div class="checkbox-container">
+      <div>
+        <label for="beforeUnloadToggle">Anti-Close</label>
+        <input type="checkbox" id="beforeUnloadToggle" />
+      </div>
+      <div>
+        <label for="autocloakToggle">Auto-about:blank</label>
+        <input type="checkbox" id="autocloakToggle" />
+      </div>
+      <div>
+        <label for="particlesToggle">Disable Particles</label>
+        <input type="checkbox" id="particlesToggle" />
+      </div>
+    </div>
+
+    <hr>
+
+    <label for="siteTitle">Set Site Title:</label>
+    <input type="text" id="siteTitle" placeholder="Enter site title" />
+
+    <label for="siteLogo">Set Site Favicon:</label>
+    <input type="file" id="siteLogo" accept="image/*" />
+    <button id="saveSettings">Save Title & Favicon</button>
+
+    <hr>
+
+    <label for="panicKey">Set Panic Button Key:</label>
+    <input type="text" id="panicKey" placeholder="Enter key (e.g., F1)" />
+
+    <label for="panicUrl">Set Panic Button URL:</label>
+    <input type="text" id="panicUrl" placeholder="Enter URL to redirect to" />
+    <button id="savePanicButtonSettings">Save Panic Button Settings</button>
+
+    <hr>
+
+    <button id="resetSettings" class="reset-button">Reset Tab Name and Icon</button>
+    <button id="resetPanicButtonSettings" class="reset-button">Reset Panic Button Settings</button>
+  </div>
+  
+<script>
+const beforeUnloadToggle = document.getElementById('beforeUnloadToggle');
+const autocloakToggle = document.getElementById('autocloakToggle');
+const particlesToggle = document.getElementById('particlesToggle');
+const siteTitleInput = document.getElementById('siteTitle');
+const siteLogoInput = document.getElementById('siteLogo');
+const panicKeyInput = document.getElementById('panicKey');
+const panicUrlInput = document.getElementById('panicUrl');
+const saveSettingsButton = document.getElementById('saveSettings');
+const savePanicButtonSettingsButton = document.getElementById('savePanicButtonSettings');
+const resetSettingsButton = document.getElementById('resetSettings');
+const resetPanicButtonSettingsButton = document.getElementById('resetPanicButtonSettings');
+const colorPicker = document.getElementById('backgroundColorPicker');
+
+// ===== LOAD SETTINGS =====
+function applySettings() {
+    // Background
+    const bg = localStorage.getItem('backgroundColor') || '#000000';
+    document.body.style.backgroundColor = bg;
+    colorPicker.value = bg;
+
+    // Title
+    const savedTitle = localStorage.getItem('siteTitle');
+    if (savedTitle) document.title = savedTitle;
+
+    // Favicon
+    const savedLogo = localStorage.getItem('siteLogo');
+    if (savedLogo) {
+        let favicon = document.querySelector("link[rel='icon']");
+        if (!favicon) {
+            favicon = document.createElement('link');
+            favicon.rel = 'icon';
+            document.head.appendChild(favicon);
+        }
+        favicon.href = savedLogo;
+    }
+
+    // Toggles
+    beforeUnloadToggle.checked = localStorage.getItem('beforeUnloadEnabled') === 'true';
+    autocloakToggle.checked = localStorage.getItem('autocloakEnabled') === 'true';
+    particlesToggle.checked = localStorage.getItem('particlesDisabled') === 'true';
+
+    // Panic button
+    panicKeyInput.value = localStorage.getItem('panicKey') || '';
+    panicUrlInput.value = localStorage.getItem('panicUrl') || '';
+
+    // Particles display
+    document.getElementById('particles-js').style.display = particlesToggle.checked ? 'none' : '';
+
+    // Anti-close
+    window.onbeforeunload = beforeUnloadToggle.checked ? () => '' : null;
+}
+applySettings();
+
+// ===== INSTANT CHANGES =====
+
+// Background colour
+colorPicker.addEventListener('input', () => {
+    document.body.style.backgroundColor = colorPicker.value;
+    localStorage.setItem('backgroundColor', colorPicker.value);
+});
+
+// Title
+siteTitleInput.addEventListener('input', () => {
+    localStorage.setItem('siteTitle', siteTitleInput.value);
+    document.title = siteTitleInput.value;
+});
+
+// Favicon
+siteLogoInput.addEventListener('change', () => {
+    const file = siteLogoInput.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+        const logoUrl = e.target.result;
+        localStorage.setItem('siteLogo', logoUrl);
+        let favicon = document.querySelector("link[rel='icon']");
+        if (!favicon) {
+            favicon = document.createElement('link');
+            favicon.rel = 'icon';
+            document.head.appendChild(favicon);
+        }
+        favicon.href = logoUrl;
+    };
+    reader.readAsDataURL(file);
+});
+
+// Particles toggle
+particlesToggle.addEventListener('change', () => {
+    localStorage.setItem('particlesDisabled', particlesToggle.checked);
+    document.getElementById('particles-js').style.display = particlesToggle.checked ? 'none' : '';
+});
+
+// Anti-close toggle
+beforeUnloadToggle.addEventListener('change', () => {
+    localStorage.setItem('beforeUnloadEnabled', beforeUnloadToggle.checked);
+    window.onbeforeunload = beforeUnloadToggle.checked ? () => '' : null;
+});
+
+// Auto cloak
+autocloakToggle.addEventListener('change', () => {
+    localStorage.setItem('autocloakEnabled', autocloakToggle.checked);
+    if (autocloakToggle.checked) {
+        const newTab = window.open('about:blank', '_blank');
+        if (newTab) {
+            const iframe = document.createElement('iframe');
+            iframe.src = '../../index.html';
+            iframe.style.cssText = 'width:100vw;height:100vh;border:none;';
+            newTab.document.body.style.margin = '0';
+            newTab.document.body.appendChild(iframe);
+        }
+        window.location.href = localStorage.getItem('panicUrl') || 'https://classroom.google.com';
+    }
+});
+
+// Panic settings
+panicKeyInput.addEventListener('input', () => {
+    localStorage.setItem('panicKey', panicKeyInput.value);
+});
+panicUrlInput.addEventListener('input', () => {
+    localStorage.setItem('panicUrl', panicUrlInput.value);
+});
+
+// Panic key trigger
+window.addEventListener('keydown', e => {
+    const panicKey = localStorage.getItem('panicKey');
+    const panicUrl = localStorage.getItem('panicUrl');
+    if (e.key === panicKey && panicUrl) {
+        window.location.href = panicUrl;
+    }
+});
+
+// Reset buttons
+resetSettingsButton.addEventListener('click', () => {
+    localStorage.removeItem('siteTitle');
+    localStorage.removeItem('siteLogo');
+    document.title = 'Home';
+    let favicon = document.querySelector('link[rel="icon"]');
+    if (favicon) favicon.href = '../../../raw.githubusercontent.com/voucan/voucan.github.io/refs/heads/main/googleclassroom.png';
+});
+
+resetPanicButtonSettingsButton.addEventListener('click', () => {
+    localStorage.removeItem('panicKey');
+    localStorage.removeItem('panicUrl');
+});
+</script>
+
+
+  <script type="text/javascript" src="../../storage/js/background.js"></script>
+  <script type="text/javascript" src="../../storage/js/cheese-algorithm.js"></script>
+</body>
+
+<!-- Mirrored from nexus-is.onthewifi.com/pages/prox/settings by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 01 Jan 2026 22:49:35 GMT -->
+</html>
